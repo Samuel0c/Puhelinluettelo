@@ -1,8 +1,12 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+var morgan = require('morgan')
+
+morgan('tiny')
 
 app.use(bodyParser.json())
+app.use(morgan('combined'))
 
 
 let numerot = [
