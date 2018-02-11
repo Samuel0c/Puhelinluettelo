@@ -1,5 +1,9 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
+
 
 let numerot = [
   {
@@ -51,6 +55,33 @@ app.delete('/api/persons/:id', (request, response) => {
   persons = numerot.filter(person => person.id !== id)
 
   response.status(204).end()
+})
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+
+  if (numerot.find(p => p.name === body.name)) {
+    return response.status(400).json({error: 'nimi on jo luettelossa'})
+  }
+
+  if (body.name === undefined || body.number === undefined) {
+    return response.status(400).json({error: 'nimi tai numero puuttuu'})
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: this.getRandomInt(99999)
+  }
+
+  console.log(person)
+  numerot = numerot.concat(person)
+  response.json(person)
 })
 
 app.listen(process.env.PORT || 3001)
