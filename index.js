@@ -28,6 +28,12 @@ app.get('/api/persons', (req, res) => {
   res.json(numerot)
 })
 
+app.get('/info', (req, res) => {
+  let text = 'Puhelinluettelossa ' + numerot.length + ' henkilön tiedot'
+  let time = new Date().toString()
+  res.send('<p>' + text + '</p>' + '<br>' + '<p>' + time + '</p>')
+})
+
 app.get('/api/persons/:id', (request, response) => {
   const id = Number(request.params.id)
   const person = numerot.find(person => person.id === id)
