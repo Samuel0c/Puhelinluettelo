@@ -51,7 +51,7 @@ app.get('/api/persons', (req, res) => {
     .then(people => {
 //      response.json(people)
       res.send(JSON.stringify(people))
-      mongoose.connection.close()
+//      mongoose.connection.close()
     })
 })
 
@@ -62,7 +62,7 @@ app.get('/info', (req, res) => {
       let text = 'Puhelinluettelossa ' + people.length + ' henkilön tiedot'
       let time = new Date().toString()
       res.send('<p>' + text + '</p>' + '<br>' + '<p>' + time + '</p>')
-      mongoose.connection.close()
+//      mongoose.connection.close()
     })
 })
 
@@ -77,7 +77,7 @@ app.get('/api/persons/:id', (request, response) => {
     } else {
       response.status(404).end()
     }
-    mongoose.connection.close()
+//    mongoose.connection.close()
   })
 
 })
@@ -93,23 +93,24 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
-  if (numerot.find(p => p.name === body.name)) {
-    return response.status(400).json({error: 'nimi on jo luettelossa'})
-  }
-
   if (body.name === undefined || body.number === undefined) {
     return response.status(400).json({error: 'nimi tai numero puuttuu'})
   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
     id: Math.floor(Math.random() * Math.floor(99999))
-  }
+  })
 
   console.log(person)
-  numerot = numerot.concat(person)
-  response.json(person)
+
+  person
+    .save()
+    .then(savedPerson => {
+      response.send(JSON.stringify(savedPerson))
+    })
+
 })
 
 app.listen(process.env.PORT || 3001)
