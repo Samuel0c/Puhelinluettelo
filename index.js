@@ -49,9 +49,11 @@ app.get('/api/persons', (req, res) => {
   Person
     .find({})
     .then(people => {
-//      response.json(people)
       res.send(JSON.stringify(people))
-//      mongoose.connection.close()
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(404).end()
     })
 })
 
@@ -62,7 +64,10 @@ app.get('/info', (req, res) => {
       let text = 'Puhelinluettelossa ' + people.length + ' henkilön tiedot'
       let time = new Date().toString()
       res.send('<p>' + text + '</p>' + '<br>' + '<p>' + time + '</p>')
-//      mongoose.connection.close()
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(404).end()
     })
 })
 
@@ -77,16 +82,27 @@ app.get('/api/persons/:id', (request, response) => {
     } else {
       response.status(404).end()
     }
-//    mongoose.connection.close()
+  })
+  .catch(error => {
+    console.log(error)
+    response.status(404).end()
   })
 
 })
 
 app.delete('/api/persons/:id', (request, response) => {
   const idToDelete = Number(request.params.id)
-  persons = numerot.filter(person => person.id !== idToDelete)
+  console.log(request.params.id, 'poistettavan id')
 
-  response.status(204).end()
+  Person
+    .find({id: idToDelete}).remove()
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => {
+      response.status(400).send({ error: 'virhe id-kentässä' })
+    })
+
 })
 
 
@@ -109,6 +125,9 @@ app.post('/api/persons', (request, response) => {
     .save()
     .then(savedPerson => {
       response.send(JSON.stringify(savedPerson))
+    })
+    .catch(error => {
+      console.log(error)
     })
 
 })
