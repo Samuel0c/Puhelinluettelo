@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 var morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
 
 morgan('tiny')
 
@@ -10,6 +11,15 @@ app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(cors())
 app.use(express.static('build'))
+
+const url = 'mongodb://samuel:mango@ds233238.mlab.com:33238/puhelinmuistio'
+mongoose.connect(url)
+
+const Person = mongoose.model('Person', {
+  name: String,
+  number: String,
+  id: Number
+})
 
 
 let numerot = [
@@ -36,30 +46,45 @@ let numerot = [
 ]
 
 app.get('/api/persons', (req, res) => {
-  res.json(numerot)
+  Person
+    .find({})
+    .then(people => {
+//      response.json(people)
+      res.send(JSON.stringify(people))
+      mongoose.connection.close()
+    })
 })
 
 app.get('/info', (req, res) => {
-  let text = 'Puhelinluettelossa ' + numerot.length + ' henkilön tiedot'
-  let time = new Date().toString()
-  res.send('<p>' + text + '</p>' + '<br>' + '<p>' + time + '</p>')
+  Person
+    .find({})
+    .then(people => {
+      let text = 'Puhelinluettelossa ' + people.length + ' henkilön tiedot'
+      let time = new Date().toString()
+      res.send('<p>' + text + '</p>' + '<br>' + '<p>' + time + '</p>')
+      mongoose.connection.close()
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = numerot.find(person => person.id === id)
+  const idToFind = Number(request.params.id)
 
-  if ( person ) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+  Person
+  .find({ id: idToFind })
+  .then(result => {
+    if ( result ) {
+      response.send(JSON.stringify(result))
+    } else {
+      response.status(404).end()
+    }
+    mongoose.connection.close()
+  })
 
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = numerot.filter(person => person.id !== id)
+  const idToDelete = Number(request.params.id)
+  persons = numerot.filter(person => person.id !== idToDelete)
 
   response.status(204).end()
 })
