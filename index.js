@@ -9,6 +9,7 @@ morgan('tiny')
 app.use(bodyParser.json())
 app.use(morgan('combined'))
 app.use(cors())
+app.use(express.static('build'))
 
 
 let numerot = [
