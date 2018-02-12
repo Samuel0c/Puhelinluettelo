@@ -2,11 +2,13 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 var morgan = require('morgan')
+const cors = require('cors')
 
 morgan('tiny')
 
 app.use(bodyParser.json())
 app.use(morgan('combined'))
+app.use(cors())
 
 
 let numerot = [
@@ -61,10 +63,6 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end()
 })
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
-
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
@@ -80,7 +78,7 @@ app.post('/api/persons', (request, response) => {
   const person = {
     name: body.name,
     number: body.number,
-    id: this.getRandomInt(99999)
+    id: Math.floor(Math.random() * Math.floor(99999))
   }
 
   console.log(person)
